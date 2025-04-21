@@ -16,29 +16,42 @@ app.get("/", (req, res) => {
 // Proxy endpoint to fetch and modify the leaderboard data
 app.get("/csgobig-proxy", async (req, res) => {
   try {
+    // Fetch data from the external CSGO Big API (time range should be updated dynamically if necessary)
     const response = await axios.get('https://csgobig.com/api/partners/getRefDetails/jonjiHBDKEBkcndi63863bfkdbKBDOSB?from=1742083200000&to=1745260800000');
     let leaderboard = response.data.results || []; // Ensure data exists
 
-    // Remove the user who abuses wagering
+    // Remove the specified user based on 'id' (bes)
     leaderboard = leaderboard.filter(user => user.id !== "76561199033503260");
 
-    // Sort the leaderboard by 'wagered' in descending order
+    // Map through the leaderboard data and modify 'wagerTotal' to 'wagered', and 'img' to 'avatar'
+    leaderboard = leaderboard.map(user => {
+      return {
+        id: user.id, 
+        name: user.name, 
+        wagered: user.wagerTotal, // Change 'wagerTotal' to 'wagered'
+        avatar: user.img, // Change 'img' to 'avatar'
+        level: user.level, 
+        lastActive: user.lastActive, 
+        joined: user.joined, 
+        prizeAmount: user.prizeAmount // prizeAmount is included for future use
+      };
+    });
+
+    // Sort leaderboard by 'wagered' (descending order)
     leaderboard.sort((a, b) => b.wagered - a.wagered);
 
-    // Assign prize amounts to the top 10 users
-    const prizeAmounts = [1000, 750, 500, 300, 150, 75, 75, 50, 50, 50];
-    leaderboard = leaderboard.slice(0, 10).map((user, index) => ({
-      userId: user.id, // Change 'id' to 'userId'
-      name: user.name,
-      wagered: user.wagered, // Keep 'wagered' as is
-      avatar: user.avatar, // Keep 'avatar' as is
-      level: user.level,
-      prize: prizeAmounts[index] || 0, // Assign prize based on position
-      class: "prize", // Add a class to identify top 10 users
-    }));
+    // Assign prize amounts for top 10 users
+    const prizeAmounts = [
+      1000, 750, 500, 300, 150, 75, 75, 50, 50, 50
+    ];
 
-    // Send the modified data as the response
-    res.json(leaderboard); // Send just the array of formatted users
+    // Assign prize amount to each user in top 10
+    leaderboard.slice(0, 10).forEach((user, index) => {
+      user.prize = prizeAmounts[index] || 0; // Ensure prize is assigned
+    });
+
+    // Send the modified data as the response (top 10 only)
+    res.json(leaderboard.slice(0, 10)); // Send only the top 10 users
   } catch (error) {
     console.error(error);
     res.status(500).send('Server Error');
