@@ -1,4 +1,3 @@
-// Importing necessary libraries
 import express from "express";
 import axios from "axios";
 import cors from "cors";
@@ -8,6 +7,11 @@ const PORT = process.env.PORT || 5000;
 
 // Enable CORS for all origins (you can adjust this in production)
 app.use(cors());
+
+// Root route to check if the service is working
+app.get("/", (req, res) => {
+  res.send("CSGOBig Proxy Service is running!");
+});
 
 // Proxy endpoint to fetch the leaderboard data
 app.get("/csgobig-proxy", async (req, res) => {
