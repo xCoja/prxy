@@ -13,11 +13,24 @@ app.get("/", (req, res) => {
   res.send("CSGOBig Proxy Service is running!");
 });
 
-// Proxy endpoint to fetch the leaderboard data
+// Proxy endpoint to fetch and modify the leaderboard data
 app.get("/csgobig-proxy", async (req, res) => {
   try {
     const response = await axios.get('https://csgobig.com/api/partners/getRefDetails/jonjiHBDKEBkcndi63863bfkdbKBDOSB?from=1742083200000&to=1745260800000');
-    res.json(response.data);
+    let leaderboard = response.data.results || []; // Ensure data exists
+
+    // Map through the leaderboard data and rename properties
+    leaderboard = leaderboard.map(user => {
+      return {
+        ...user,
+        wagered: user.wagerTotal, // Rename 'wagerTotal' to 'wagered'
+        prizeAmount: user.prize || 0, // Rename 'prize' to 'prizeAmount'
+        // You can add more renaming here as needed
+      };
+    });
+
+    // Send the modified data as the response
+    res.json({ results: leaderboard });
   } catch (error) {
     console.error(error);
     res.status(500).send('Server Error');
