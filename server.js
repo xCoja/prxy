@@ -19,33 +19,23 @@ app.get("/csgobig-proxy", async (req, res) => {
     const response = await axios.get('https://csgobig.com/api/partners/getRefDetails/jonjiHBDKEBkcndi63863bfkdbKBDOSB?from=1742083200000&to=1745260800000');
     let leaderboard = response.data.results || []; // Ensure data exists
 
-    // Map through the leaderboard data and modify just 'wagerTotal' and 'img' fields
-    leaderboard = leaderboard.map(user => {
-      return {
-        id: user.id, // Keep 'id' as is
-        name: user.name, // Keep 'name' as is
-        wagerTotal: user.wagerTotal, // Keep 'wagerTotal' as is
-        img: user.img, // Keep 'img' as is
-        level: user.level, // Keep 'level' as is
-        lastActive: user.lastActive, // Keep 'lastActive' as is
-        joined: user.joined, // Keep 'joined' as is
-        totalDeposits: user.totalDeposits, // Keep 'totalDeposits' as is
-        totalRewards: user.totalRewards, // Keep 'totalRewards' as is
-        prizeAmount: user.prizeAmount // Keep 'prizeAmount' as is
-      };
-    });
+    // Remove the user who abuses wagering
+    leaderboard = leaderboard.filter(user => user.id !== "76561199033503260");
 
-    // Modify just the fields for 'wagerTotal' to 'wagered' and 'img' to 'avatar'
-    leaderboard = leaderboard.map(user => {
-      return {
-        ...user, // Spread existing user data
-        wagered: user.wagerTotal, // Change 'wagerTotal' to 'wagered'
-        avatar: user.img, // Change 'img' to 'avatar'
-        // Remove 'wagerTotal' and 'img' from the object
-        // 'wagerTotal': undefined,
-        // 'img': undefined
-      };
-    });
+    // Sort the leaderboard by 'wagered' in descending order
+    leaderboard.sort((a, b) => b.wagered - a.wagered);
+
+    // Assign prize amounts to the top 10 users
+    const prizeAmounts = [1000, 750, 500, 300, 150, 75, 75, 50, 50, 50];
+    leaderboard = leaderboard.slice(0, 10).map((user, index) => ({
+      userId: user.id, // Change 'id' to 'userId'
+      name: user.name,
+      wagered: user.wagered, // Keep 'wagered' as is
+      avatar: user.avatar, // Keep 'avatar' as is
+      level: user.level,
+      prize: prizeAmounts[index] || 0, // Assign prize based on position
+      class: "prize", // Add a class to identify top 10 users
+    }));
 
     // Send the modified data as the response
     res.json(leaderboard); // Send just the array of formatted users
