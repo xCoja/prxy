@@ -21,7 +21,7 @@ app.get("/csgobig-proxy", async (req, res) => {
     let leaderboard = response.data.results || []; // Ensure data exists
 
     // Remove the specified user based on 'id' (bes)
-    leaderboard = leaderboard.filter(user => user.id !== "76561199033503260");
+    leaderboard = leaderboard.filter(user => user.id !== "7f996c39-e616-4d3c-9565-62f7cac64182");
 
     // Map through the leaderboard data and modify 'wagerTotal' to 'wagered', and 'img' to 'avatar'
     leaderboard = leaderboard.map(user => {
