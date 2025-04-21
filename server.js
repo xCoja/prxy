@@ -1,26 +1,26 @@
-// server.js
-const express = require("express");
-const cors = require("cors");
-const fetch = require("node-fetch");
+// Importing necessary libraries
+import express from "express";
+import axios from "axios";
+import cors from "cors";
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 5000;
 
+// Enable CORS for all origins (you can adjust this in production)
 app.use(cors());
 
-app.get("/api/leaderboard", async (req, res) => {
-    try {
-        const response = await fetch(
-            "https://csgobig.com/api/partners/getRefDetails/jonjiHBDKEBkcndi63863bfkdbKBDOSB?from=1742083200000&to=1745260800000"
-        );
-        const data = await response.json();
-        res.json(data);
-    } catch (error) {
-        console.error("Proxy error:", error);
-        res.status(500).json({ error: "Failed to fetch data" });
-    }
+// Proxy endpoint to fetch the leaderboard data
+app.get("/csgobig-proxy", async (req, res) => {
+  try {
+    const response = await axios.get('https://csgobig.com/api/partners/getRefDetails/jonjiHBDKEBkcndi63863bfkdbKBDOSB?from=1742083200000&to=1745260800000');
+    res.json(response.data);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Server Error');
+  }
 });
 
+// Start the server
 app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
+  console.log(`Server is running on port ${PORT}`);
 });
