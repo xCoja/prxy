@@ -19,18 +19,20 @@ app.get("/csgobig-proxy", async (req, res) => {
     const response = await axios.get('https://csgobig.com/api/partners/getRefDetails/jonjiHBDKEBkcndi63863bfkdbKBDOSB?from=1742083200000&to=1745260800000');
     let leaderboard = response.data.results || []; // Ensure data exists
 
-    // Map through the leaderboard data and rename properties
+    // Map through the leaderboard data and format it as per your request
     leaderboard = leaderboard.map(user => {
       return {
-        ...user,
-        wagered: user.wagerTotal, // Rename 'wagerTotal' to 'wagered'
-        prizeAmount: user.prize || 0, // Rename 'prize' to 'prizeAmount'
-        // You can add more renaming here as needed
+        userId: user.id, // Rename 'id' to 'userId'
+        name: user.name, // Keep 'name' as is
+        wagered: user.wagerTotal, // Keep 'wagerTotal' as 'wagered'
+        avatar: user.img, // Rename 'img' to 'avatar'
+        level: user.level, // Keep 'level' as is
+        prize: user.prize || 0 // Rename 'prizeAmount' to 'prize' and default to 0 if not available
       };
     });
 
     // Send the modified data as the response
-    res.json({ results: leaderboard });
+    res.json(leaderboard); // Send just the array of formatted users
   } catch (error) {
     console.error(error);
     res.status(500).send('Server Error');
