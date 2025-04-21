@@ -19,15 +19,31 @@ app.get("/csgobig-proxy", async (req, res) => {
     const response = await axios.get('https://csgobig.com/api/partners/getRefDetails/jonjiHBDKEBkcndi63863bfkdbKBDOSB?from=1742083200000&to=1745260800000');
     let leaderboard = response.data.results || []; // Ensure data exists
 
-    // Map through the leaderboard data and format it as per your request
+    // Map through the leaderboard data and modify just 'wagerTotal' and 'img' fields
     leaderboard = leaderboard.map(user => {
       return {
-        userId: user.id, // Rename 'id' to 'userId'
+        id: user.id, // Keep 'id' as is
         name: user.name, // Keep 'name' as is
-        wagered: user.wagerTotal, // Keep 'wagerTotal' as 'wagered'
-        avatar: user.img, // Rename 'img' to 'avatar'
+        wagerTotal: user.wagerTotal, // Keep 'wagerTotal' as is
+        img: user.img, // Keep 'img' as is
         level: user.level, // Keep 'level' as is
-        prize: user.prize || 0 // Rename 'prizeAmount' to 'prize' and default to 0 if not available
+        lastActive: user.lastActive, // Keep 'lastActive' as is
+        joined: user.joined, // Keep 'joined' as is
+        totalDeposits: user.totalDeposits, // Keep 'totalDeposits' as is
+        totalRewards: user.totalRewards, // Keep 'totalRewards' as is
+        prizeAmount: user.prizeAmount // Keep 'prizeAmount' as is
+      };
+    });
+
+    // Modify just the fields for 'wagerTotal' to 'wagered' and 'img' to 'avatar'
+    leaderboard = leaderboard.map(user => {
+      return {
+        ...user, // Spread existing user data
+        wagered: user.wagerTotal, // Change 'wagerTotal' to 'wagered'
+        avatar: user.img, // Change 'img' to 'avatar'
+        // Remove 'wagerTotal' and 'img' from the object
+        // 'wagerTotal': undefined,
+        // 'img': undefined
       };
     });
 
