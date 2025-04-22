@@ -17,7 +17,7 @@ app.get("/", (req, res) => {
 app.get("/csgobig-proxy", async (req, res) => {
   try {
     // Fetch data from the external CSGO Big API (time range should be updated dynamically if necessary)
-    const response = await axios.get('https://csgobig.com/api/partners/getRefDetails/jonjiHBDKEBkcndi63863bfkdbKBDOSB?from=1742083200000&to=1745260800000');
+    const response = await axios.get('https://csgobig.com/api/partners/getRefDetails/jonjiHBDKEBkcndi63863bfkdbKBDOSB?from=1745280000000&to=1747958400000');
     let leaderboard = response.data.results || []; // Ensure data exists
 
     // Remove the specified user based on 'id' (bes)
