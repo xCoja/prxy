@@ -13,15 +13,9 @@ const API_KEY = '05381fe04025772964ce1fedc91b55d7'; // Your API key
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Calculate Monday 00:00 UTC and next Tuesday 00:00 UTC
-const now = new Date();
-const dayOfWeek = now.getUTCDay();
-const diffToMonday = (dayOfWeek === 0 ? -6 : 1) - dayOfWeek;
-const monday = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() + diffToMonday));
-
-// Set the minTime and maxTime dynamically
-const MIN_TIME = monday.getTime();  // Monday 00:00 UTC
-const MAX_TIME = monday.getTime() + (24 * 60 * 60 * 1000); // Next Tuesday 00:00 UTC
+// Set the minTime and maxTime statically for lifetime data
+const MIN_TIME = new Date(Date.UTC(2023, 0, 1, 0, 0, 0)).getTime();  // January 1, 2023, 00:00 UTC
+const MAX_TIME = new Date(Date.UTC(2026, 11, 31, 23, 59, 59)).getTime();  // December 31, 2026, 23:59 UTC
 
 const CACHE_DURATION = 15 * 60 * 1000; // 15 minutes in milliseconds
 
@@ -47,7 +41,7 @@ app.get('/api/leaderboard', async (req, res) => {
             }
         }
 
-        // Fetch fresh data from Chicken.GG API with the dynamic minTime and maxTime
+        // Fetch fresh data from Chicken.GG API with the static minTime and maxTime
         const url = `https://affiliates.chicken.gg/v1/referrals?key=${API_KEY}&minTime=${MIN_TIME}&maxTime=${MAX_TIME}`;
         
         const response = await fetch(url);
